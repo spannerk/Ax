@@ -21,7 +21,7 @@ from sqlalchemy.orm import scoped_session, Session, sessionmaker
 HASH_FIELD_LENGTH: int = 32
 NAME_OR_TYPE_FIELD_LENGTH: int = 100
 LONG_STRING_FIELD_LENGTH: int = 255
-JSON_FIELD_LENGTH: int = 2048
+JSON_FIELD_LENGTH: int = 4096
 
 # by default, Text gets mapped to a TEXT field in MySQL is 2^16 - 1
 # we use have MEDIUMTEXT and LONGTEXT in the MySQL db; in this case, use
