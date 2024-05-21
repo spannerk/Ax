@@ -28,7 +28,9 @@ from ax.storage.sqa_store.db import (
 from ax.storage.sqa_store.json import (
     JSONEncodedDict,
     JSONEncodedList,
-    JSONEncodedLongTextDict
+    JSONEncodedLongTextDict,
+    JSONEncodedObject,
+    JSONEncodedTextDict,
 )
 from ax.storage.sqa_store.sqa_enum import IntEnum, StringEnum
 from ax.storage.sqa_store.timestamp import IntTimestamp
@@ -42,7 +44,6 @@ from sqlalchemy import (
     Integer,
     String,
     Text,
-    BLOB
 )
 from sqlalchemy.orm import backref, relationship
 
@@ -72,7 +73,7 @@ class SQAParameter(Base):
     is_fidelity: Optional[bool] = Column(Boolean)
     # pyre-fixme[8]: Attribute has type `Union[None, bool, float, int, str]`; used
     #  as `Column[typing.Any]`.
-    target_value: Optional[TParamValue] = Column(BLOB)
+    target_value: Optional[TParamValue] = Column(JSONEncodedObject)
 
     # Attributes for Range Parameters
     # pyre-fixme[8]: Attribute has type `Optional[int]`; used as `Column[int]`.
@@ -95,12 +96,12 @@ class SQAParameter(Base):
     # pyre-fixme[8]: Attribute has type `Optional[bool]`; used as `Column[bool]`.
     is_task: Optional[bool] = Column(Boolean)
     # pyre-fixme[8]: Attribute has type `Optional[bool]`; used as `Column[bool]`.
-    dependents: Optional[Dict[TParamValue, List[str]]] = Column(BLOB)
+    dependents: Optional[Dict[TParamValue, List[str]]] = Column(JSONEncodedObject)
 
     # Attributes for Fixed Parameters
     # pyre-fixme[8]: Attribute has type `Union[None, bool, float, int, str]`; used
     #  as `Column[typing.Any]`.
-    fixed_value: Optional[TParamValue] = Column(BLOB)
+    fixed_value: Optional[TParamValue] = Column(JSONEncodedObject)
 
 
 class SQAParameterConstraint(Base):
@@ -140,7 +141,7 @@ class SQAMetric(Base):
     name: str = Column(String(LONG_STRING_FIELD_LENGTH), nullable=False)
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Any]]`; used as
     #  `Column[typing.Any]`.
-    properties: Optional[Dict[str, Any]] = Column(BLOB, default={})
+    properties: Optional[Dict[str, Any]] = Column(JSONEncodedTextDict, default={})
 
     # Attributes for Objectives
     # pyre-fixme[8]: Attribute has type `Optional[bool]`; used as `Column[bool]`.
@@ -207,7 +208,7 @@ class SQAArm(Base):
     name: Optional[str] = Column(String(NAME_OR_TYPE_FIELD_LENGTH))
     # pyre-fixme[8]: Attribute has type `Dict[str, typing.Union[None, bool, float,
     #  int, str]]`; used as `Column[typing.Any]`.
-    parameters: TParameterization = Column(BLOB, nullable=False)
+    parameters: TParameterization = Column(JSONEncodedTextDict, nullable=False)
     # pyre-fixme[8]: Attribute has type `float`; used as `Column[decimal.Decimal]`.
     weight: float = Column(Float, nullable=False, default=1.0)
 
@@ -236,7 +237,7 @@ class SQAGeneratorRun(Base):
     best_arm_name: Optional[str] = Column(String(NAME_OR_TYPE_FIELD_LENGTH))
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Union[None, bool,
     #  float, int, str]]]`; used as `Column[typing.Any]`.
-    best_arm_parameters: Optional[TParameterization] = Column(BLOB)
+    best_arm_parameters: Optional[TParameterization] = Column(JSONEncodedTextDict)
     # pyre-fixme[8]: Attribute has type `Optional[typing.Tuple[Dict[str, float],
     #  Optional[Dict[str, Dict[str, float]]]]]`; used as `Column[typing.Any]`.
     best_arm_predictions: Optional[TModelPredictArm] = Column(JSONEncodedList)
@@ -267,16 +268,16 @@ class SQAGeneratorRun(Base):
     model_key: Optional[str] = Column(String(NAME_OR_TYPE_FIELD_LENGTH))
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Any]]`; used as
     #  `Column[typing.Any]`.
-    model_kwargs: Optional[Dict[str, Any]] = Column(BLOB)
+    model_kwargs: Optional[Dict[str, Any]] = Column(JSONEncodedTextDict)
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Any]]`; used as
     #  `Column[typing.Any]`.
-    bridge_kwargs: Optional[Dict[str, Any]] = Column(BLOB)
+    bridge_kwargs: Optional[Dict[str, Any]] = Column(JSONEncodedTextDict)
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Any]]`; used as
     #  `Column[typing.Any]`.
-    gen_metadata: Optional[Dict[str, Any]] = Column(BLOB)
+    gen_metadata: Optional[Dict[str, Any]] = Column(JSONEncodedTextDict)
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Any]]`; used as
     #  `Column[typing.Any]`.
-    model_state_after_gen: Optional[Dict[str, Any]] = Column(BLOB)
+    model_state_after_gen: Optional[Dict[str, Any]] = Column(JSONEncodedTextDict)
     # pyre-fixme[8]: Attribute has type `Optional[int]`; used as `Column[int]`.
     generation_strategy_id: Optional[int] = Column(
         Integer, ForeignKey("generation_strategy.id")
@@ -286,7 +287,7 @@ class SQAGeneratorRun(Base):
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Any]]`; used as
     #  `Column[typing.Any]`.
     candidate_metadata_by_arm_signature: Optional[Dict[str, Any]] = Column(
-        BLOB
+        JSONEncodedTextDict
     )
     # pyre-fixme[8]: Attribute has type `Optional[str]`; used as `Column[str]`.
     generation_node_name: Optional[str] = Column(String(NAME_OR_TYPE_FIELD_LENGTH))
@@ -412,7 +413,7 @@ class SQATrial(Base):
     run_metadata: Optional[Dict[str, Any]] = Column(JSONEncodedLongTextDict)
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Any]]`; used as
     #  `Column[typing.Any]`.
-    stop_metadata: Optional[Dict[str, Any]] = Column(BLOB)
+    stop_metadata: Optional[Dict[str, Any]] = Column(JSONEncodedTextDict)
     # pyre-fixme[8]: Attribute has type `TrialStatus`; used as `Column[typing.Any]`.
     status: TrialStatus = Column(
         IntEnum(TrialStatus), nullable=False, default=TrialStatus.CANDIDATE
@@ -436,7 +437,7 @@ class SQATrial(Base):
     generation_step_index: Optional[int] = Column(Integer)
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Any]]`; used as
     #  `Column[typing.Any]`.
-    properties: Optional[Dict[str, Any]] = Column(BLOB, default={})
+    properties: Optional[Dict[str, Any]] = Column(JSONEncodedTextDict, default={})
 
     # relationships
     # Trials and experiments are mutable, so the children relationships need
@@ -470,12 +471,12 @@ class SQAExperiment(Base):
     name: str = Column(String(NAME_OR_TYPE_FIELD_LENGTH), nullable=False)
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Any]]`; used as
     #  `Column[typing.Any]`.
-    properties: Optional[Dict[str, Any]] = Column(BLOB, default={})
+    properties: Optional[Dict[str, Any]] = Column(JSONEncodedTextDict, default={})
     # pyre-fixme[8]: Attribute has type `Optional[str]`; used as `Column[str]`.
     status_quo_name: Optional[str] = Column(String(NAME_OR_TYPE_FIELD_LENGTH))
     # pyre-fixme[8]: Attribute has type `Optional[Dict[str, typing.Union[None, bool,
     #  float, int, str]]]`; used as `Column[typing.Any]`.
-    status_quo_parameters: Optional[TParameterization] = Column(BLOB)
+    status_quo_parameters: Optional[TParameterization] = Column(JSONEncodedTextDict)
     # pyre-fixme[8]: Attribute has type `datetime`; used as `Column[typing.Any]`.
     time_created: datetime = Column(IntTimestamp, nullable=False)
     # pyre-fixme[8]: Attribute has type `Optional[str]`; used as `Column[str]`.
