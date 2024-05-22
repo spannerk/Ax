@@ -12,7 +12,8 @@ from typing import Any, Dict, List, Optional
 
 from ax.storage.sqa_store.db import JSON_FIELD_LENGTH, LONGTEXT_BYTES, MEDIUMTEXT_BYTES
 from sqlalchemy.ext.mutable import MutableDict, MutableList
-from sqlalchemy.types import Text, TypeDecorator, VARCHAR
+from sqlalchemy.types import Text, TypeDecorator, VARCHAR, LargeBinary
+
 
 
 class JSONEncodedObject(TypeDecorator):
@@ -24,7 +25,7 @@ class JSONEncodedObject(TypeDecorator):
 
     """
 
-    impl: VARCHAR = VARCHAR(JSON_FIELD_LENGTH)
+    impl: LargeBinary
 
     cache_ok = True
 
@@ -67,7 +68,7 @@ class JSONEncodedText(JSONEncodedObject):
 
     # pyre-fixme[15]: `impl` overrides attribute defined in `JSONEncodedObject`
     #  inconsistently.
-    impl = Text
+    impl = LargeBinary
 
 
 class JSONEncodedMediumText(JSONEncodedObject):
@@ -80,7 +81,7 @@ class JSONEncodedMediumText(JSONEncodedObject):
 
     # pyre-fixme[15]: `impl` overrides attribute defined in `JSONEncodedObject`
     #  inconsistently.
-    impl = Text(MEDIUMTEXT_BYTES)
+    impl = LargeBinary
 
 
 class JSONEncodedLongText(JSONEncodedObject):
@@ -93,7 +94,8 @@ class JSONEncodedLongText(JSONEncodedObject):
 
     # pyre-fixme[15]: `impl` overrides attribute defined in `JSONEncodedObject`
     #  inconsistently.
-    impl = Text(LONGTEXT_BYTES)
+    impl = LargeBinary
+
 
 
 # pyre-fixme[5]: Global expression must be annotated.
