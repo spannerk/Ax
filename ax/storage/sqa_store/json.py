@@ -43,7 +43,7 @@ class JSONEncodedObject(TypeDecorator):
     # pyre-fixme[2]: Parameter annotation cannot be `Any`.
     def process_bind_param(self, value: Any, dialect: Any) -> Optional[str]:
         if value is not None:
-            return json.dumps(value)
+            return json.dumps(value).encode('utf-8')
         else:
             return None
 
@@ -52,7 +52,7 @@ class JSONEncodedObject(TypeDecorator):
     def process_result_value(self, value: Any, dialect: Any) -> Any:
         if value is not None:
             try:  # TODO T61331534: revert this; just a hotfix for AutoML
-                return json.loads(value, object_pairs_hook=self.object_pairs_hook)
+                return json.loads(value.decode('utf-8'), object_pairs_hook=self.object_pairs_hook)
             except JSONDecodeError:
                 return None
         else:
