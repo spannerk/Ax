@@ -25,7 +25,7 @@ class JSONEncodedObject(TypeDecorator):
 
     """
 
-    impl: LargeBinary
+    impl = LargeBinary
 
     cache_ok = True
 
