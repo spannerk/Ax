@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional
 
 from ax.storage.sqa_store.db import JSON_FIELD_LENGTH, LONGTEXT_BYTES, MEDIUMTEXT_BYTES
 from sqlalchemy.ext.mutable import MutableDict, MutableList
-from sqlalchemy.types import Text, TypeDecorator, VARCHAR, LargeBinary
+from sqlalchemy.types import Text, TypeDecorator, VARCHAR, LargeBinary, JSON
 
 
 
@@ -25,7 +25,7 @@ class JSONEncodedObject(TypeDecorator):
 
     """
 
-    impl = LargeBinary
+    impl = JSON
 
     cache_ok = True
 
@@ -43,7 +43,8 @@ class JSONEncodedObject(TypeDecorator):
     # pyre-fixme[2]: Parameter annotation cannot be `Any`.
     def process_bind_param(self, value: Any, dialect: Any) -> Optional[str]:
         if value is not None:
-            return json.dumps(value).encode('utf-8')
+            # return json.dumps(value).encode('utf-8')
+            return value
         else:
             return None
 
@@ -52,7 +53,8 @@ class JSONEncodedObject(TypeDecorator):
     def process_result_value(self, value: Any, dialect: Any) -> Any:
         if value is not None:
             try:  # TODO T61331534: revert this; just a hotfix for AutoML
-                return json.loads(value.decode('utf-8'), object_pairs_hook=self.object_pairs_hook)
+                # return json.loads(value.decode('utf-8'), object_pairs_hook=self.object_pairs_hook)
+                return value
             except JSONDecodeError:
                 return None
         else:
@@ -68,7 +70,7 @@ class JSONEncodedText(JSONEncodedObject):
 
     # pyre-fixme[15]: `impl` overrides attribute defined in `JSONEncodedObject`
     #  inconsistently.
-    impl = LargeBinary
+    impl = JSON
 
 
 class JSONEncodedMediumText(JSONEncodedObject):
@@ -81,7 +83,7 @@ class JSONEncodedMediumText(JSONEncodedObject):
 
     # pyre-fixme[15]: `impl` overrides attribute defined in `JSONEncodedObject`
     #  inconsistently.
-    impl = LargeBinary
+    impl = JSON
 
 
 class JSONEncodedLongText(JSONEncodedObject):
@@ -94,7 +96,7 @@ class JSONEncodedLongText(JSONEncodedObject):
 
     # pyre-fixme[15]: `impl` overrides attribute defined in `JSONEncodedObject`
     #  inconsistently.
-    impl = LargeBinary
+    impl = JSON
 
 
 
