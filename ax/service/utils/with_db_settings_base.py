@@ -38,17 +38,17 @@ try:  # We don't require SQLAlchemy by default.
 
     # pyre-fixme[16]: Module `sqlalchemy` has no attribute `__version__`.
     sqa_major_version = int(not_none(re.match(r"^\d*", sqa_version))[0])
-    if sqa_major_version > 1:
-        msg = (
-            "Ax currently requires a sqlalchemy version below 2.0. This will be "
-            "addressed in a future release. Disabling SQL storage in Ax for now, if "
-            "you would like to use SQL storage please install Ax with mysql extras "
-            "via `pip install ax-platform[mysql]`."
-        )
+    # if sqa_major_version > 1:
+    #     msg = (
+    #         "Ax currently requires a sqlalchemy version below 2.0. This will be "
+    #         "addressed in a future release. Disabling SQL storage in Ax for now, if "
+    #         "you would like to use SQL storage please install Ax with mysql extras "
+    #         "via `pip install ax-platform[mysql]`."
+    #     )
 
-        logger.warning(msg)
+    #     logger.warning(msg)
 
-        raise IncompatibleDependencyVersion(msg)
+    #     raise IncompatibleDependencyVersion(msg)
 
     from ax.storage.sqa_store.db import init_engine_and_session_factory
     from ax.storage.sqa_store.decoder import Decoder
